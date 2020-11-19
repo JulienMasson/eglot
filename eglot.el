@@ -218,6 +218,10 @@ let the buffer grow forever."
   "If non-nil, don't display eglot message."
   :type 'boolean)
 
+(defcustom eglot-flymake-enable t
+  "If non-nil, enable flymake mode in current buffer."
+  :type 'boolean)
+
 
 ;;; Constants
 ;;;
@@ -1365,8 +1369,9 @@ Use `eglot-managed-p' to determine if current buffer is managed.")
     (unless (eglot--stay-out-of-p 'imenu)
       (add-function :before-until (local 'imenu-create-index-function)
                     #'eglot-imenu))
-    (flymake-mode 1)
     (eldoc-mode 1)
+    (when eglot-flymake-enable
+      (flymake-mode 1))
     (cl-pushnew (current-buffer) (eglot--managed-buffers eglot--cached-server)))
    (t
     (remove-hook 'after-change-functions 'eglot--after-change t)
