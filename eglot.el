@@ -214,6 +214,10 @@ let the buffer grow forever."
   :type '(choice (const :tag "Don't show confirmation prompt" nil)
                  (symbol :tag "Show confirmation prompt" 'confirm)))
 
+(defcustom eglot-no-message nil
+  "If non-nil, don't display eglot message."
+  :type 'boolean)
+
 
 ;;; Constants
 ;;;
@@ -1066,7 +1070,8 @@ CONNECT-ARGS are passed as additional arguments to
 
 (defun eglot--message (format &rest args)
   "Message out with FORMAT with ARGS."
-  (message "[eglot] %s" (apply #'format format args)))
+  (unless eglot-no-message
+    (message "[eglot] %s" (apply #'format format args))))
 
 (defun eglot--warn (format &rest args)
   "Warning message with FORMAT and ARGS."
