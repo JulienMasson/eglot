@@ -886,7 +886,8 @@ Each function is passed the server as an argument")
 (defun eglot--connect (managed-major-mode project class contact)
   "Connect to MANAGED-MAJOR-MODE, PROJECT, CLASS and CONTACT.
 This docstring appeases checkdoc, that's all."
-  (let* ((default-directory (project-root project))
+  (let* ((initial-buffer (current-buffer))
+	 (default-directory (project-root project))
          (nickname (file-name-base (directory-file-name default-directory)))
          (readable-name (format "EGLOT (%s/%s)" nickname managed-major-mode))
          autostart-inferior-process
@@ -964,14 +965,13 @@ This docstring appeases checkdoc, that's all."
                           (setf (eglot--capabilities server) capabilities)
                           (setf (eglot--server-info server) serverInfo)
                           (jsonrpc-notify server :initialized eglot--{})
-                          (dolist (buffer (buffer-list))
-                            (with-current-buffer buffer
-                              ;; No need to pass SERVER as an argument: it has
-                              ;; been registered in `eglot--servers-by-project',
-                              ;; so that it can be found (and cached) from
-                              ;; `eglot--maybe-activate-editing-mode' in any
-                              ;; managed buffer.
-                              (eglot--maybe-activate-editing-mode)))
+                          ;; No need to pass SERVER as an argument: it has
+                          ;; been registered in `eglot--servers-by-project',
+                          ;; so that it can be found (and cached) from
+                          ;; `eglot--maybe-activate-editing-mode' in any
+                          ;; managed buffer.
+			  (with-current-buffer initial-buffer
+                            (eglot--maybe-activate-editing-mode))
                           (setf (eglot--inhibit-autoreconnect server)
                                 (cond
                                  ((booleanp eglot-autoreconnect)
